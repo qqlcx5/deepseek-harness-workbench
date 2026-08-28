@@ -475,6 +475,11 @@
       "source": "packages/todo/tool-todo/src/types.ts"
     },
     {
+      "doc": "docs/subsystems/memory.md",
+      "symbol": "MemoryProvider",
+      "source": "packages/memory/memory/src/types.ts"
+    },
+    {
       "doc": "docs/subsystems/session.md",
       "symbol": "SessionEvent",
       "source": "packages/core/session/src/types.ts"

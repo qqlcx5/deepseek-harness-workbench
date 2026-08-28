@@ -1200,6 +1200,30 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'memory',
+    summary: 'The agent-memory service.',
+    description: 'The agent-memory service. Registered as `ctx.memory` (one instance per context).\n\nSelection semantics (resolved at execution time, never order-dependent):\n\n- A configured id that is registered and `available()` → that provider.\n- A configured id not registered → `MEMORY_PROVIDER_CONFIGURED_MISSING`.\n- A configured id registered but unavailable → `MEMORY_PROVIDER_CONFIGURED_UNAVAILABLE`.\n- No id configured, exactly one registered usable provider → that provider.\n- No id configured, multiple usable providers → `MEMORY_PROVIDER_AMBIGUOUS`.\n- No id configured, no usable provider → `MEMORY_PROVIDER_UNAVAILABLE`.',
+    methods: [
+      {
+        signature: 'registerMemoryProvider(provider: MemoryProvider): () => void',
+        description: 'Register a memory provider. Throws MemoryError `MEMORY_DUPLICATE_PROVIDER` if its id is already registered. Returns a disposer; disposed with the calling fiber.',
+        parameters: [{ name: 'provider', description: 'the provider; its `id` is the registry key.' }],
+        returns: 'the disposer that unregisters the provider.',
+      },
+      {
+        signature: 'async recall(request: MemoryRecallRequest, signal?: AbortSignal): Promise<MemoryRecallResult>',
+        description: 'Recall stored memory relevant to one query through the selected provider. Resolves the provider at call time with the selection rules above; throws MemoryError when the capability cannot run. The seam enforces `request.limit` on the result: if the provider over-returns, `hits[]` is truncated.',
+        parameters: [{ name: 'request', description: 'the query, isolation scope, and optional hit cap.' }, { name: 'signal', description: 'optional cancellation signal forwarded to the provider.' }],
+        returns: 'the provider\'s fragments, capped to `request.limit`.',
+      },
+      {
+        signature: 'async record(request: MemoryRecordRequest, signal?: AbortSignal): Promise<void>',
+        description: 'Archive one finished conversation fragment through the selected provider. Resolves the provider at call time with the selection rules above; throws MemoryError when the capability cannot run.',
+        parameters: [{ name: 'request', description: 'the isolation scope and messages to store.' }, { name: 'signal', description: 'optional cancellation signal forwarded to the provider.' }],
+      },
+    ],
+  },
+  {
     key: 'messageFeedback',
     summary: 'Storage-domain sidecar service.',
     description: 'Storage-domain sidecar service. It inspects persisted Session history and never creates or resumes an Agent or Session.',
@@ -4341,6 +4365,34 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'ManualCompactAgentContext',
     declaration: 'export interface ManualCompactAgentContext extends CompactionAgentContext {\n    runMaintenance<T>(task: (signal: AbortSignal) => Promise<T>): Promise<T>;\n}',
+  },
+  {
+    name: 'MemoryHit',
+    declaration: 'export interface MemoryHit {\n    readonly layer: MemoryLayer;\n    readonly score: number;\n    readonly text: string;\n    readonly role?: \'user\' | \'assistant\';\n    readonly timestamp?: string;\n}',
+  },
+  {
+    name: 'MemoryLayer',
+    declaration: 'export type MemoryLayer = \'conversation\' | \'atomic\';',
+  },
+  {
+    name: 'MemoryProvider',
+    declaration: 'export interface MemoryProvider {\n    readonly id: string;\n    available(): boolean;\n    recall(request: MemoryRecallRequest, signal?: AbortSignal): Promise<MemoryRecallResult>;\n    record(request: MemoryRecordRequest, signal?: AbortSignal): Promise<void>;\n}',
+  },
+  {
+    name: 'MemoryRecallRequest',
+    declaration: 'export interface MemoryRecallRequest {\n    readonly query: string;\n    readonly sessionId: string;\n    readonly limit?: number;\n}',
+  },
+  {
+    name: 'MemoryRecallResult',
+    declaration: 'export interface MemoryRecallResult {\n    readonly hits: readonly MemoryHit[];\n}',
+  },
+  {
+    name: 'MemoryRecordRequest',
+    declaration: 'export interface MemoryRecordRequest {\n    readonly sessionId: string;\n    readonly messages: readonly MemoryTurnMessage[];\n}',
+  },
+  {
+    name: 'MemoryTurnMessage',
+    declaration: 'export interface MemoryTurnMessage {\n    readonly role: \'user\' | \'assistant\';\n    readonly content: string;\n    readonly timestamp: string;\n}',
   },
   {
     name: 'Message',

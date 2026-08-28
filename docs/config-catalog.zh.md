@@ -1511,6 +1511,83 @@ export interface ReconnectConfig {
 
 来源：[`packages/mcp/mcp-client/src/index.ts:98`](../packages/mcp/mcp-client/src/index.ts)
 
+<a id="deepseek-aidsh-memory"></a>
+
+## `@deepseek-ai/dsh-memory`
+
+```ts config-catalog
+/**
+ * Config for the memory seam. `provider` pins which provider wins; it is
+ * optional (a single registered usable provider auto-selects). Operational
+ * overrides such as environment variables must feed this same field rather
+ * than introduce a hidden priority chain.
+ */
+export interface MemoryRuntimeConfig {
+  /** Explicit provider id. Omitted = auto-select when exactly one usable. */
+  readonly provider?: string
+}
+```
+
+来源：[`packages/memory/memory/src/index.ts:51`](../packages/memory/memory/src/index.ts)
+
+<a id="deepseek-aidsh-memory-session"></a>
+
+## `@deepseek-ai/dsh-memory-session`
+
+需要：`agents` · `memory`
+
+```ts config-catalog
+/** Plugin config: recall/archive toggles and the recall hit cap. */
+export interface Config {
+  /** Recall stored memory into each turn's first step. Defaults to true. */
+  recall?: boolean
+  /** Archive each finished turn's user/assistant messages. Defaults to true. */
+  archive?: boolean
+  /** Upper bound on hits recalled into one turn. Defaults to 8. */
+  maxHits?: number
+}
+```
+
+来源：[`packages/memory/memory-session/src/index.ts:29`](../packages/memory/memory-session/src/index.ts)
+
+<a id="deepseek-aidsh-memory-tencentdb"></a>
+
+## `@deepseek-ai/dsh-memory-tencentdb`
+
+需要：`memory`
+
+```ts config-catalog
+/**
+ * Plugin config: the MemoryCore v3 endpoint and its strict-isolation
+ * identity. Every field except `apiKey`/`layerLimit`/`timeoutMs` is required
+ * at load; a missing required field fails plugin load rather than silently
+ * disabling memory.
+ */
+export interface Config {
+  /** MemoryCore base URL, for example `http://127.0.0.1:8420`. */
+  endpoint: string
+  /** Bearer key from the Memory Hub panel. Falls back to `$TDAI_USER_KEY`. */
+  apiKey?: string
+  /** Memory instance id sent as `x-tdai-service-id`. */
+  serviceId: string
+  /** Strict-isolation team id. */
+  teamId: string
+  /** Strict-isolation agent id. */
+  agentId: string
+  /** Strict-isolation user id. */
+  userId: string
+  /** Optional strict-isolation task id carried on every request. */
+  taskId?: string
+  /** Per-layer hit count requested from each backend search. Defaults to 8. */
+  layerLimit?: number
+  /** SDK transport request timeout in milliseconds. Defaults to 30000. */
+  timeoutMs?: number
+}
+```
+
+来源：[`packages/memory/memory-tencentdb/src/index.ts:37`](../packages/memory/memory-tencentdb/src/index.ts)
+
+
 <a id="deepseek-aidsh-message-feedback"></a>
 
 ## `@deepseek-ai/dsh-message-feedback`

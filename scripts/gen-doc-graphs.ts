@@ -589,6 +589,15 @@ const SERVICE_ROLES: ServiceRole[] = [
     note: 'Search and fetch providers register into one ctx.web seam; tool-web owns the stable model-facing names.',
   },
   {
+    key: 'memory',
+    pkg: 'memory',
+    title: 'Agent-memory provider registry',
+    mode: 'seam',
+    implementations: ['memory-tencentdb'],
+    consumers: ['memory-session'],
+    note: 'Memory providers register into one ctx.memory seam; memory-session recalls into each turn and archives finished turns.',
+  },
+  {
     key: 'spillStore',
     pkg: 'spill',
     title: 'Spill storage seam',
